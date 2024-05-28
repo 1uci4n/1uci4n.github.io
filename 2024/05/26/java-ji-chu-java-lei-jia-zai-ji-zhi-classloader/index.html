@@ -352,7 +352,7 @@ Java类加载机制是学习Java安全必不可缺的知识，比如冰蝎Webshe
 <p>可以配合JVM中类加载的结构层次图（某师傅的图）理解上述代码</p>
 <p><img src="/assets/class-loader-parents-delegation-model.png" alt="类加载器的结构层次"></p>
 <p>Java 类加载器加载类的流程可以概括为：类加载器首先检查缓存，查看类是否已经加载；如果未加载，则根据双亲委派模型将类加载请求委派给父类加载器，直到启动类加载器；如果父类加载器无法加载，当前类加载器自行尝试加载类。</p>
-<h2 id="0x04-自定义ClassLoader"><a href="#0x04-自定义ClassLoader" class="headerlink" title="0x04 自定义ClassLoader"></a>0x04 自定义<code>ClassLoader</code></h2><p>我们可以通过字节码的方式来定义一个类，并且调用这个类的方法，即无需通过写java文件的形式来定义这个类。</p>
+<h2 id="0x04-自定义ClassLoader"><a href="#0x04-自定义ClassLoader" class="headerlink" title="0x04 自定义ClassLoader"></a>0x04 自定义ClassLoader</h2><p>我们可以通过字节码的方式来定义一个类，并且调用这个类的方法，即无需通过写java文件的形式来定义这个类。</p>
 <p>我们可以先写个简单的test类，并用javac命令编译该java文件成class文件，最后输出class文件的byte数组，代码如下：</p>
 <pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">org<span class="token punctuation">.</span>example</span><span class="token punctuation">;</span>
 
@@ -426,7 +426,7 @@ Java类加载机制是学习Java安全必不可缺的知识，比如冰蝎Webshe
 <p>运行结果如下：</p>
 <p><img src="/assets/image-20240528153715860.png"></p>
 <p>通过这种方式来定义的test类，在一定程度上能有效的绕过RASP检测，来执行恶意代码。</p>
-<h2 id="0x05-URLCLassLoader"><a href="#0x05-URLCLassLoader" class="headerlink" title="0x05 URLCLassLoader"></a>0x05 <code>URLCLassLoader</code></h2><p>当然，除了自定义的<code>CLassLoader</code>外，Java一些常用的库就提供了他们自己定义的<code>CLassLoader</code>，比如<code>java.net.URLClassLoader</code>，它可以从指定的 URL 路径、JAR 文件或目录中加载类和资源。在写漏洞利用的<code>payload</code>或者<code>webshell</code>的时候我们可以使用这个特性来加载远程的jar来实现远程的类方法调用。</p>
+<h2 id="0x05-URLCLassLoader"><a href="#0x05-URLCLassLoader" class="headerlink" title="0x05 URLCLassLoader"></a>0x05 URLCLassLoader</h2><p>当然，除了自定义的<code>CLassLoader</code>外，Java一些常用的库就提供了他们自己定义的<code>CLassLoader</code>，比如<code>java.net.URLClassLoader</code>，它可以从指定的 URL 路径、JAR 文件或目录中加载类和资源。在写漏洞利用的<code>payload</code>或者<code>webshell</code>的时候我们可以使用这个特性来加载远程的jar来实现远程的类方法调用。</p>
 <pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">org<span class="token punctuation">.</span>example</span><span class="token punctuation">;</span>
 
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">ByteArrayOutputStream</span></span><span class="token punctuation">;</span>
